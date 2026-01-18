@@ -241,8 +241,8 @@ registerForm?.addEventListener('submit', async (e) => {
     }
     
     try {
-        // Согласно документации API: POST /api/fitness/auth/register
-        const url = `${API_BASE_URL}/auth/register`;
+        // Используем правильный endpoint для регистрации
+        const url = 'https://webdev-hw-api.vercel.app/api/v2/users';
         console.log('Registering to:', url);
         console.log('Request body:', { email, password: '***' });
         
@@ -259,12 +259,29 @@ registerForm?.addEventListener('submit', async (e) => {
         });
         
         console.log('Register response status:', response.status, response.statusText);
-        console.log('Register response headers:', Object.fromEntries(response.headers.entries()));
+        
+        // Читаем ответ один раз и сохраняем
+        let responseText = '';
+        let data = null;
+        
+        try {
+            responseText = await response.text();
+            if (responseText) {
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    // Если не JSON, создаем объект с сообщением
+                    data = { message: responseText || ERROR_MESSAGES.generic };
+                }
+            }
+        } catch (parseError) {
+            console.error('Failed to parse response:', parseError);
+            data = { message: ERROR_MESSAGES.generic };
+        }
         
         // Если получили 405 или 404, значит URL или метод неправильный
         if (response.status === 405 || response.status === 404) {
-            const text = await response.text();
-            console.error(`${response.status} Error response body:`, text);
+            console.error(`${response.status} Error response body:`, responseText);
             console.error('Response headers:', Object.fromEntries(response.headers.entries()));
             
             let errorMsg = `Ошибка ${response.status}: Сервер не может обработать запрос. `;
@@ -277,33 +294,6 @@ registerForm?.addEventListener('submit', async (e) => {
             
             showError(registerError, errorMsg, emailInput);
             return;
-        }
-        
-        let data = null;
-        
-        // Пытаемся прочитать ответ как JSON или текст
-        try {
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                const text = await response.text();
-                if (text) {
-                    data = JSON.parse(text);
-                }
-            } else {
-                const text = await response.text();
-                console.error('Registration response (non-JSON):', text);
-                if (text) {
-                    try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        // Если не JSON, создаем объект с сообщением
-                        data = { message: text || ERROR_MESSAGES.generic };
-                    }
-                }
-            }
-        } catch (parseError) {
-            console.error('Failed to parse response:', parseError);
-            data = { message: ERROR_MESSAGES.generic };
         }
         
         if (response.ok) {
