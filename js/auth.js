@@ -241,8 +241,8 @@ registerForm?.addEventListener('submit', async (e) => {
     }
     
     try {
-        // Используем правильный endpoint для регистрации
-        const url = 'https://webdev-hw-api.vercel.app/api/v2/users';
+        // Используем правильный endpoint для регистрации (согласованный со структурой логина)
+        const url = 'https://webdev-hw-api.vercel.app/api/fitness/users';
         console.log('Registering to:', url);
         console.log('Request body:', { email, password: '***' });
         
