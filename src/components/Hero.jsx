@@ -4,7 +4,7 @@ const Hero = () => {
       <div className="container">
         <div className="hero__content">
           <h1 className="hero__title">
-            Начните заниматься спортом и<br />улучшите качество жизни
+            Начните заниматься спортом<br />и улучшите качество жизни
           </h1>
           <div className="hero__badge">
             <p className="hero__badge-text">
@@ -23,4 +23,8 @@ const Hero = () => {
 };
 
 export default Hero;
+
+
+
+
 

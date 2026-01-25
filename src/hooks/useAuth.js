@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_BASE_URL = 'https://webdev-hw-api.vercel.app/api/fitness';
+const API_BASE_URL = 'https://wedev-api.sky.pro/api/fitness';
 
 const ERROR_MESSAGES = {
   loginIncorrect: 'Пароль введен неверно, попробуйте еще раз.',
@@ -26,9 +26,6 @@ export const useAuth = () => {
       const url = `${API_BASE_URL}/auth/login`;
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': ''
-        },
         body: JSON.stringify({ email, password })
       });
 
@@ -63,19 +60,15 @@ export const useAuth = () => {
         return { success: false, error: errorMessage };
       }
     } catch (error) {
-      console.error('Login request failed:', error);
       return { success: false, error: ERROR_MESSAGES.generic };
     }
   };
 
   const register = async (email, password) => {
     try {
-      const url = 'https://webdev-hw-api.vercel.app/api/users';
+      const url = `${API_BASE_URL}/auth/register`;
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({ email, password })
       });
 
@@ -118,7 +111,6 @@ export const useAuth = () => {
         return { success: false, error: errorMessage };
       }
     } catch (error) {
-      console.error('Registration request failed:', error);
       return { success: false, error: ERROR_MESSAGES.generic };
     }
   };
@@ -138,4 +130,5 @@ export const useAuth = () => {
     isAuthenticated: !!user
   };
 };
+
 

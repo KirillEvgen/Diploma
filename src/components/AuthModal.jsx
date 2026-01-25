@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { useAuth } from '../hooks/useAuth';
 
@@ -10,6 +11,7 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
@@ -49,7 +51,10 @@ const AuthModal = ({ isOpen, onClose }) => {
 
     if (result.success) {
       onClose();
-      window.location.reload();
+      
+      setTimeout(() => {
+        navigate('/profile');
+      }, 100);
     } else {
       setError(result.error);
     }
@@ -188,4 +193,8 @@ const AuthModal = ({ isOpen, onClose }) => {
 };
 
 export default AuthModal;
+
+
+
+
 

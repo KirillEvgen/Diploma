@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
+
 const Logo = ({ className = '' }) => {
   return (
-    <div className={`logo ${className}`}>
+    <Link to="/" className={`logo ${className}`} style={{ textDecoration: 'none' }}>
       <div className="logo__icon">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M8 5V19L19 12L8 5Z" fill="url(#playGradient)"/>
@@ -13,9 +15,13 @@ const Logo = ({ className = '' }) => {
         </svg>
       </div>
       <span className="logo__text">SkyFitnessPro</span>
-    </div>
+    </Link>
   );
 };
 
 export default Logo;
+
+
+
+
 

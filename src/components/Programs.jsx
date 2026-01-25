@@ -9,6 +9,12 @@ const Programs = () => {
           {programs.map((program) => (
             <ProgramCard key={program.id} program={program} />
           ))}
+          <button 
+            className="btn btn--primary programs__scroll-top-btn" 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            Наверх ↑
+          </button>
         </div>
       </div>
     </section>
@@ -16,4 +22,8 @@ const Programs = () => {
 };
 
 export default Programs;
+
+
+
+
 

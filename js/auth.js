@@ -1,5 +1,5 @@
 
-const API_BASE_URL = 'https://webdev-hw-api.vercel.app/api/fitness';
+const API_BASE_URL = 'https://wedev-api.sky.pro/api/fitness';
 
 const ERROR_MESSAGES = {
     loginIncorrect: 'Пароль введен неверно, попробуйте еще раз.',
@@ -104,9 +104,6 @@ loginForm?.addEventListener('submit', async (e) => {
         
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': ''
-                },
             body: JSON.stringify({
                 email: email,
                 password: password
@@ -209,15 +206,12 @@ registerForm?.addEventListener('submit', async (e) => {
     }
     
     try {
-        const url = 'https://webdev-hw-api.vercel.app/api/users';
+        const url = `${API_BASE_URL}/auth/register`;
         console.log('Registering to:', url);
         console.log('Request body:', { email, password: '***' });
         
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify({
                 email: email,
                 password: password

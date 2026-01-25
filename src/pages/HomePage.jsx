@@ -1,7 +1,6 @@
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import Programs from '../components/Programs';
-import Footer from '../components/Footer';
 
 const HomePage = ({ onOpenAuth }) => {
   return (
@@ -11,10 +10,13 @@ const HomePage = ({ onOpenAuth }) => {
         <Hero />
         <Programs />
       </main>
-      <Footer />
     </>
   );
 };
 
 export default HomePage;
+
+
+
+
 
