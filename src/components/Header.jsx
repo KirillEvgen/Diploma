@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { useAuth } from '../hooks/useAuth';
+import styles from './Header.module.css';
 
 const Header = ({ onOpenAuth }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -61,30 +62,30 @@ const Header = ({ onOpenAuth }) => {
   const userName = getUserName();
 
   return (
-    <header className="header">
+    <header className={styles.header}>
       <div className="container">
-        <div className="header__content">
-          <div className="header__logo-section">
+        <div className={styles.content}>
+          <div className={styles.logoSection}>
             <Logo />
-            <p className="header__subtitle">Онлайн-тренировки для занятий дома</p>
+            <p className={styles.subtitle}>Онлайн-тренировки для занятий дома</p>
           </div>
           {isAuthenticated && user ? (
-            <div className="header__user-menu" ref={dropdownRef}>
+            <div className={styles.userMenu} ref={dropdownRef}>
               <button 
-                className="header__user-btn" 
+                className={styles.userBtn} 
                 onClick={handleUserMenuClick}
                 type="button"
               >
-                <div className="header__user-avatar">
+                <div className={styles.userAvatar}>
                   <img 
                     src="/images/svg/profile-icon.svg" 
                     alt="Профиль"
-                    className="header__user-avatar-img"
+                    className={styles.userAvatarImg}
                   />
                 </div>
-                <span className="header__user-name">{userName}</span>
+                <span className={styles.userName}>{userName}</span>
                 <svg 
-                  className={`header__user-arrow ${dropdownOpen ? 'header__user-arrow--open' : ''}`}
+                  className={`${styles.userArrow} ${dropdownOpen ? styles.userArrowOpen : ''}`}
                   width="12" 
                   height="8" 
                   viewBox="0 0 12 8" 
@@ -100,15 +101,15 @@ const Header = ({ onOpenAuth }) => {
                 </svg>
               </button>
               {dropdownOpen && (
-                <div className="header__dropdown">
+                <div className={styles.dropdown}>
                   <button 
-                    className="header__dropdown-item"
+                    className={styles.dropdownItem}
                     onClick={handleProfileClick}
                   >
                     Мой профиль
                   </button>
                   <button 
-                    className="header__dropdown-item"
+                    className={styles.dropdownItem}
                     onClick={handleLogout}
                   >
                     Выйти
@@ -118,7 +119,7 @@ const Header = ({ onOpenAuth }) => {
             </div>
           ) : (
             <button 
-              className="btn btn--primary header__btn" 
+              className={`btn btn--primary ${styles.btn}`} 
               onClick={handleLoginClick}
               type="button"
             >

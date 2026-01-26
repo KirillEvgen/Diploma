@@ -1,16 +1,17 @@
 import ProgramCard from './ProgramCard';
 import { programs } from '../data/programs';
+import styles from './Programs.module.css';
 
-const Programs = () => {
+const Programs = ({ onOpenAuth }) => {
   return (
-    <section className="programs">
+    <section className={styles.programs}>
       <div className="container">
-        <div className="programs__grid">
+        <div className={styles.grid}>
           {programs.map((program) => (
-            <ProgramCard key={program.id} program={program} />
+            <ProgramCard key={program.id} program={program} onOpenAuth={onOpenAuth} />
           ))}
           <button 
-            className="btn btn--primary programs__scroll-top-btn" 
+            className={`btn btn--primary ${styles.scrollTopBtn}`} 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             Наверх ↑

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import styles from './Logo.module.css';
 
 const Logo = ({ className = '' }) => {
   return (
-    <Link to="/" className={`logo ${className}`} style={{ textDecoration: 'none' }}>
-      <div className="logo__icon">
+    <Link to="/" className={`${styles.logo} ${className}`} style={{ textDecoration: 'none' }}>
+      <div className={styles.icon}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M8 5V19L19 12L8 5Z" fill="url(#playGradient)"/>
           <defs>
@@ -14,7 +15,7 @@ const Logo = ({ className = '' }) => {
           </defs>
         </svg>
       </div>
-      <span className="logo__text">SkyFitnessPro</span>
+      <span className={styles.text}>SkyFitnessPro</span>
     </Link>
   );
 };

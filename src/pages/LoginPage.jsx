@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import styles from './LoginPage.module.css';
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -59,40 +60,38 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-logo">
-          <Link to="/" className="logo">
-            <Logo />
-          </Link>
+    <div className={styles.authPage}>
+      <div className={styles.authContainer}>
+        <div className={styles.authLogo}>
+          <Logo />
         </div>
 
         {isLogin ? (
-          <form className="auth-form auth-form--login" onSubmit={handleLogin}>
-            <div className="auth-form__fields">
-              <div className="auth-form__field">
+          <form className={styles.form} onSubmit={handleLogin}>
+            <div className={styles.fields}>
+              <div className={styles.field}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Эл. почта"
                   required
                 />
               </div>
-              <div className="auth-form__field">
+              <div className={styles.field}>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Пароль"
                   required
                 />
-                {error && <p className="auth-form__error auth-form__error--visible">{error}</p>}
+                {error && <p className={`${styles.error} ${styles.errorVisible}`}>{error}</p>}
               </div>
             </div>
-            <div className="auth-form__actions">
+            <div className={styles.actions}>
               <button type="submit" className="btn btn--primary btn--full" disabled={loading}>
                 {loading ? 'Вход...' : 'Войти'}
               </button>
@@ -109,41 +108,41 @@ const LoginPage = () => {
             </div>
           </form>
         ) : (
-          <form className="auth-form auth-form--register" onSubmit={handleRegister}>
-            <div className="auth-form__fields">
-              <div className="auth-form__field">
+          <form className={styles.form} onSubmit={handleRegister}>
+            <div className={styles.fields}>
+              <div className={styles.field}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Эл. почта"
                   required
                 />
               </div>
-              <div className="auth-form__field">
+              <div className={styles.field}>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Пароль"
                   required
                 />
               </div>
-              <div className="auth-form__field">
+              <div className={styles.field}>
                 <input
                   type="password"
                   value={passwordConfirm}
                   onChange={(e) => setPasswordConfirm(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Повторите пароль"
                   required
                 />
-                {error && <p className="auth-form__error auth-form__error--visible">{error}</p>}
+                {error && <p className={`${styles.error} ${styles.errorVisible}`}>{error}</p>}
               </div>
             </div>
-            <div className="auth-form__actions">
+            <div className={styles.actions}>
               <button type="submit" className="btn btn--primary btn--full" disabled={loading}>
                 {loading ? 'Регистрация...' : 'Зарегистрироваться'}
               </button>

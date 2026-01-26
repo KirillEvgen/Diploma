@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import { programs, getProgramById } from '../data/programs';
-
-const API_BASE_URL = 'https://wedev-api.sky.pro/api/fitness';
+import { getAllCourses, removeUserCourse } from '../api/coursesApi';
+import { getWorkoutById, getCourseWorkouts } from '../api/workoutsApi';
+import { getUserProgress, calculateWorkoutProgress, resetProgress } from '../api/progressApi';
+import styles from './ProfilePage.module.css';
 
 const ProfilePage = ({ onOpenAuth }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -27,57 +29,25 @@ const ProfilePage = ({ onOpenAuth }) => {
 
     const fetchCourseProgress = async (apiCourseId) => {
       try {
-        const token = localStorage.getItem('token');
+        const workoutsResult = await getCourseWorkouts(apiCourseId);
         
-        const workoutsResponse = await fetch(`${API_BASE_URL}/courses/${apiCourseId}/workouts`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (!workoutsResponse.ok) {
+        if (!workoutsResult.success || !workoutsResult.data || workoutsResult.data.length === 0) {
           return 0;
         }
 
-        const workouts = await workoutsResponse.json();
-        if (!workouts || workouts.length === 0) {
-          return 0;
-        }
-
+        const workouts = workoutsResult.data;
         const progressPromises = workouts.map(async (workout) => {
           try {
-            const [progressResponse, workoutDetailResponse] = await Promise.all([
-              fetch(
-                `${API_BASE_URL}/users/me/progress?courseId=${apiCourseId}&workoutId=${workout._id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`
-                  }
-                }
-              ),
-              fetch(
-                `${API_BASE_URL}/workouts/${workout._id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`
-                  }
-                }
-              )
+            const [progressResult, workoutDetailResult] = await Promise.all([
+              getUserProgress(apiCourseId, workout._id),
+              getWorkoutById(workout._id),
             ]);
 
-            if (progressResponse.ok && workoutDetailResponse.ok) {
-              const progressData = await progressResponse.json();
-              const workoutDetail = await workoutDetailResponse.json();
-              
-              if (progressData.workoutCompleted) {
-                return 100;
-              } else if (progressData.progressData && progressData.progressData.length > 0) {
-                const workoutProgress = progressData.progressData.reduce((sum, val) => sum + (val || 0), 0);
-                const exercises = workoutDetail.exercises || [];
-                const workoutTotal = exercises.reduce((sum, ex) => sum + (ex.quantity || 0), 0);
-                const workoutPercent = workoutTotal > 0 ? Math.min(100, Math.round((workoutProgress / workoutTotal) * 100)) : 0;
-                return workoutPercent;
-              }
+            if (progressResult.success && workoutDetailResult.success) {
+              return calculateWorkoutProgress(
+                progressResult.data,
+                workoutDetailResult.data?.exercises || []
+              );
             }
             return 0;
           } catch (error) {
@@ -107,9 +77,10 @@ const ProfilePage = ({ onOpenAuth }) => {
 
         try {
           const courseIds = JSON.parse(savedCourseIds);
-          const allCoursesResponse = await fetch(`${API_BASE_URL}/courses`);
-          if (allCoursesResponse.ok) {
-            const allCourses = await allCoursesResponse.json();
+          const allCoursesResult = await getAllCourses();
+          
+          if (allCoursesResult.success && allCoursesResult.data) {
+            const allCourses = allCoursesResult.data;
             setAllApiCourses(allCourses);
             
             const userCoursesData = allCourses.filter(course => 
@@ -153,32 +124,19 @@ const ProfilePage = ({ onOpenAuth }) => {
       return;
     }
 
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`${API_BASE_URL}/users/me/courses/${courseId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+    const result = await removeUserCourse(courseId);
+    
+    if (result.success) {
+      const updatedCourses = userCourses.filter(course => {
+        const courseIdToCheck = course._id || course.id || course.courseId;
+        return courseIdToCheck !== courseId;
       });
-
-      if (response.ok) {
-        
-        
-        const updatedCourses = userCourses.filter(course => {
-          const courseIdToCheck = course._id || course.id || course.courseId;
-          return courseIdToCheck !== courseId;
-        });
-        setUserCourses(updatedCourses);
-        
-        const courseIds = updatedCourses.map(c => c._id || c.id || c.courseId);
-        localStorage.setItem('userCourses', JSON.stringify(courseIds));
-      } else {
-        alert('Не удалось удалить курс. Попробуйте еще раз.');
-      }
-    } catch (error) {
-      alert('Произошла ошибка. Попробуйте еще раз.');
+      setUserCourses(updatedCourses);
+      
+      const courseIds = updatedCourses.map(c => c._id || c.id || c.courseId);
+      localStorage.setItem('userCourses', JSON.stringify(courseIds));
+    } else {
+      alert(result.error || 'Не удалось удалить курс. Попробуйте еще раз.');
     }
   };
 
@@ -221,26 +179,17 @@ const ProfilePage = ({ onOpenAuth }) => {
 
     if (progress === 100) {
       try {
-        const token = localStorage.getItem('token');
+        const workoutsResult = await getCourseWorkouts(apiCourseId);
         
-        const workoutsResponse = await fetch(`${API_BASE_URL}/courses/${apiCourseId}/workouts`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (workoutsResponse.ok) {
-          const workouts = await workoutsResponse.json();
+        if (workoutsResult.success && workoutsResult.data) {
+          const workouts = workoutsResult.data;
           
+          // Сбрасываем прогресс для всех тренировок
           for (const workout of workouts) {
             try {
-              await fetch(`${API_BASE_URL}/courses/${apiCourseId}/workouts/${workout._id}/reset`, {
-                method: 'PATCH',
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              });
+              await resetProgress(apiCourseId, workout._id);
             } catch (error) {
+              // Игнорируем ошибки при сбросе
             }
           }
           
@@ -251,31 +200,17 @@ const ProfilePage = ({ onOpenAuth }) => {
           }));
         }
       } catch (error) {
+        // Игнорируем ошибки
       }
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const workoutsResult = await getCourseWorkouts(apiCourseId);
       
-      
-      const response = await fetch(`${API_BASE_URL}/courses/${apiCourseId}/workouts`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const workouts = await response.json();
-        if (workouts && workouts.length > 0) {
-          
-          const firstWorkout = workouts[0];
-          navigate(`/course/${courseId}/workout/${firstWorkout._id}`);
-        } else {
-          
-          navigate(`/course/${courseId}`);
-        }
+      if (workoutsResult.success && workoutsResult.data && workoutsResult.data.length > 0) {
+        const firstWorkout = workoutsResult.data[0];
+        navigate(`/course/${courseId}/workout/${firstWorkout._id}`);
       } else {
-        
         navigate(`/course/${courseId}`);
       }
     } catch (error) {
@@ -299,7 +234,7 @@ const ProfilePage = ({ onOpenAuth }) => {
         <Header onOpenAuth={onOpenAuth} />
         <main className="main">
           <div className="container">
-            <div className="profile-page__loading">Загрузка...</div>
+            <div className={styles.loading}>Загрузка...</div>
           </div>
         </main>
       </>
@@ -315,25 +250,25 @@ const ProfilePage = ({ onOpenAuth }) => {
       <Header onOpenAuth={onOpenAuth} />
       <main className="main">
         <div className="container">
-          <div className="profile-page">
-            <div className="profile-page__section">
-              <h2 className="profile-page__section-title">Профиль</h2>
-              <div className="profile-page__profile-card">
-                <div className="profile-page__profile-content">
-                  <div className="profile-page__avatar">
+          <div className={styles.profilePage}>
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Профиль</h2>
+              <div className={styles.profileCard}>
+                <div className={styles.profileContent}>
+                  <div className={styles.avatar}>
                     <img 
                       src="/images/svg/profile-icon.svg" 
                       alt="Профиль"
-                      className="profile-page__avatar-img"
+                      className={styles.avatarImg}
                     />
                   </div>
-                  <div className="profile-page__profile-info">
-                    <div className="profile-page__profile-header">
-                      <h3 className="profile-page__name">{userName}</h3>
-                      <p className="profile-page__login">Логин: {userLogin}</p>
+                  <div className={styles.profileInfo}>
+                    <div className={styles.profileHeader}>
+                      <h3 className={styles.name}>{userName}</h3>
+                      <p className={styles.login}>Логин: {userLogin}</p>
                     </div>
                     <button 
-                      className="btn btn--secondary profile-page__logout-btn"
+                      className={`btn btn--secondary ${styles.logoutBtn}`}
                       onClick={handleLogout}
                     >
                       Выйти
@@ -343,11 +278,11 @@ const ProfilePage = ({ onOpenAuth }) => {
               </div>
             </div>
 
-            <div className="profile-page__section">
-              <h2 className="profile-page__section-title">Мои курсы</h2>
-              <div className="profile-page__courses-list">
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Мои курсы</h2>
+              <div className={styles.coursesList}>
                 {userCourses.length === 0 ? (
-                  <p className="profile-page__empty">У вас пока нет добавленных курсов</p>
+                  <p className={styles.empty}>У вас пока нет добавленных курсов</p>
                 ) : (
                   <>
                     {userCourses.map((course) => {
@@ -376,9 +311,9 @@ const ProfilePage = ({ onOpenAuth }) => {
                     const progress = courseProgress[courseId] ?? 0;
 
                     return (
-                      <div key={courseId} className="profile-page__course-card">
+                      <div key={courseId} className={styles.courseCard}>
                         <button
-                          className="profile-page__delete-btn"
+                          className={styles.deleteBtn}
                           onClick={() => handleDeleteCourse(courseId)}
                           title="Удалить курс"
                           style={{ color: program.bgColor }}
@@ -386,57 +321,57 @@ const ProfilePage = ({ onOpenAuth }) => {
                           <img 
                             src="/images/svg/remove-in-circle.svg" 
                             alt="Удалить"
-                            className="profile-page__delete-icon"
+                            className={styles.deleteIcon}
                           />
                         </button>
-                        <div className="profile-page__course-image">
+                        <div className={styles.courseImage}>
                           <img 
                             src={program.image} 
                             alt={program.title}
-                            className="profile-page__course-img"
+                            className={styles.courseImg}
                           />
                         </div>
-                        <div className="profile-page__course-content">
-                          <h3 className="profile-page__course-title">{program.title}</h3>
-                          <div className="profile-page__course-meta">
-                            <div className="profile-page__meta-item">
+                        <div className={styles.courseContent}>
+                          <h3 className={styles.courseTitle}>{program.title}</h3>
+                          <div className={styles.courseMeta}>
+                            <div className={styles.metaItem}>
                               <img 
                                 src="/images/svg/kalendar.svg" 
                                 alt=""
-                                className="profile-page__meta-icon"
+                                className={styles.metaIcon}
                               />
                               <span>{program.duration}</span>
                             </div>
-                            <div className="profile-page__meta-item">
+                            <div className={styles.metaItem}>
                               <img 
                                 src="/images/svg/time.svg" 
                                 alt=""
-                                className="profile-page__meta-icon"
+                                className={styles.metaIcon}
                               />
                               <span>{program.timePerDay}</span>
                             </div>
-                            <div className="profile-page__meta-item">
+                            <div className={styles.metaItem}>
                               <img 
                                 src="/images/svg/signal.svg" 
                                 alt=""
-                                className="profile-page__meta-icon"
+                                className={styles.metaIcon}
                               />
                               <span>{program.difficulty}</span>
                             </div>
                           </div>
-                          <div className="profile-page__course-progress">
-                            <div className="profile-page__progress-header">
-                              <span className="profile-page__progress-text">Прогресс {progress}%</span>
-                              <div className="profile-page__progress-bar">
+                          <div className={styles.courseProgress}>
+                            <div className={styles.progressHeader}>
+                              <span className={styles.progressText}>Прогресс {progress}%</span>
+                              <div className={styles.progressBar}>
                                 <div 
-                                  className="profile-page__progress-fill"
+                                  className={styles.progressFill}
                                   style={{ width: `${progress}%` }}
                                 />
                               </div>
                             </div>
                           </div>
                                  <button
-                                   className="btn btn--primary profile-page__course-action-btn"
+                                   className={`btn btn--primary ${styles.courseActionBtn}`}
                                    onClick={() => {
                                      
                                      const localProgramId = program.id;
@@ -450,7 +385,7 @@ const ProfilePage = ({ onOpenAuth }) => {
                     );
                   })}
                     <button 
-                      className="btn btn--primary profile-page__scroll-top-btn" 
+                      className={`btn btn--primary ${styles.scrollTopBtn}`} 
                       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     >
                       Наверх ↑

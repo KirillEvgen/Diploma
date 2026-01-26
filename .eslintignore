@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.vite
+*.config.js
+*.config.cjs
+*.config.mjs
+coverage
+.nyc_output
+*.log
+.DS_Store
+public
+

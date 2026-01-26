@@ -8,7 +8,7 @@ const HomePage = ({ onOpenAuth }) => {
       <Header onOpenAuth={onOpenAuth} />
       <main className="main">
         <Hero />
-        <Programs />
+        <Programs onOpenAuth={onOpenAuth} />
       </main>
     </>
   );

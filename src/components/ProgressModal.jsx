@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import styles from './ProgressModal.module.css';
 
 const ProgressModal = ({ isOpen, onClose, exercises, currentProgress, onSave, workoutId, courseId }) => {
   const [progressData, setProgressData] = useState([]);
@@ -49,35 +50,35 @@ const ProgressModal = ({ isOpen, onClose, exercises, currentProgress, onSave, wo
   if (!isOpen) return null;
 
   return (
-    <div className="progress-modal progress-modal--visible">
-      <div className="progress-modal__overlay" onClick={onClose}></div>
-      <div className="progress-modal__container">
-        <div className="progress-modal__header">
-          <h2 className="progress-modal__title">Мой прогресс</h2>
+    <div className={`${styles.progressModal} ${styles.progressModalVisible}`}>
+      <div className={styles.overlay} onClick={onClose}></div>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Мой прогресс</h2>
           <button 
-            className="progress-modal__close"
+            className={styles.close}
             onClick={onClose}
             type="button"
           >
             ×
           </button>
         </div>
-        <div className="progress-modal__content">
+        <div className={styles.content}>
           {exercises && exercises.length > 0 ? (
-            <div className="progress-modal__exercises">
+            <div className={styles.exercises}>
               {exercises.map((exercise, index) => (
-                <div key={exercise._id || index} className="progress-modal__exercise">
-                  <label className="progress-modal__exercise-label">
+                <div key={exercise._id || index} className={styles.exercise}>
+                  <label className={styles.exerciseLabel}>
                     Сколько раз вы сделали {exercise.name?.toLowerCase() || `упражнение ${index + 1}`}?
                     {exercise.quantity && (
-                      <span className="progress-modal__exercise-quantity">
+                      <span className={styles.exerciseQuantity}>
                         (максимум: {exercise.quantity})
                       </span>
                     )}
                   </label>
                   <input
                     type="number"
-                    className="progress-modal__exercise-input"
+                    className={styles.exerciseInput}
                     min="0"
                     max={exercise.quantity || 1000}
                     value={progressData[index] === 0 ? '' : (progressData[index] || '')}
@@ -100,19 +101,19 @@ const ProgressModal = ({ isOpen, onClose, exercises, currentProgress, onSave, wo
               ))}
             </div>
           ) : (
-            <p className="progress-modal__no-exercises">Упражнения не найдены</p>
+            <p className={styles.noExercises}>Упражнения не найдены</p>
           )}
         </div>
-        <div className="progress-modal__actions">
+        <div className={styles.actions}>
           <button
-            className="btn btn--secondary progress-modal__cancel-btn"
+            className={`btn btn--secondary ${styles.cancelBtn}`}
             onClick={onClose}
             type="button"
           >
             Отмена
           </button>
           <button
-            className="btn btn--primary progress-modal__save-btn"
+            className={`btn btn--primary ${styles.saveBtn}`}
             onClick={handleSave}
             type="button"
           >

@@ -1,19 +1,21 @@
+import styles from './Hero.module.css';
+
 const Hero = () => {
   return (
-    <section className="hero">
+    <section className={styles.hero}>
       <div className="container">
-        <div className="hero__content">
-          <h1 className="hero__title">
+        <div className={styles.content}>
+          <h1 className={styles.title}>
             Начните заниматься спортом<br />и улучшите качество жизни
           </h1>
-          <div className="hero__badge">
-            <p className="hero__badge-text">
+          <div className={styles.badge}>
+            <p className={styles.badgeText}>
               Измени своё<br />тело за полгода!
             </p>
             <img 
               src="/images/icons/badge-arrow.png" 
               alt="" 
-              className="hero__badge-arrow" 
+              className={styles.badgeArrow} 
             />
           </div>
         </div>

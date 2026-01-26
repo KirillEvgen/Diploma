@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { useAuth } from '../hooks/useAuth';
+import styles from './AuthModal.module.css';
 
 const AuthModal = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -87,39 +88,39 @@ const AuthModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="auth-modal auth-modal--visible">
-      <div className="auth-modal__overlay" onClick={onClose}></div>
-      <div className="auth-modal__container">
-        <div className="auth-logo">
+    <div className={`${styles.authModal} ${styles.authModalVisible}`}>
+      <div className={styles.overlay} onClick={onClose}></div>
+      <div className={styles.container}>
+        <div className={styles.logo}>
           <Logo />
         </div>
 
         {isLogin ? (
-          <form className="auth-form auth-form--login" onSubmit={handleLogin}>
-            <div className="auth-form__fields">
-              <div className="auth-form__field">
+          <form className={styles.form} onSubmit={handleLogin}>
+            <div className={styles.fields}>
+              <div className={styles.field}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Эл. почта"
                   required
                 />
               </div>
-              <div className="auth-form__field">
+              <div className={styles.field}>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Пароль"
                   required
                 />
-                {error && <p className="auth-form__error auth-form__error--visible">{error}</p>}
+                {error && <p className={`${styles.error} ${styles.errorVisible}`}>{error}</p>}
               </div>
             </div>
-            <div className="auth-form__actions">
+            <div className={styles.actions}>
               <button type="submit" className="btn btn--primary btn--full" disabled={loading}>
                 {loading ? 'Вход...' : 'Войти'}
               </button>
@@ -136,41 +137,41 @@ const AuthModal = ({ isOpen, onClose }) => {
             </div>
           </form>
         ) : (
-          <form className="auth-form auth-form--register" onSubmit={handleRegister}>
-            <div className="auth-form__fields">
-              <div className="auth-form__field">
+          <form className={styles.form} onSubmit={handleRegister}>
+            <div className={styles.fields}>
+              <div className={styles.field}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Эл. почта"
                   required
                 />
               </div>
-              <div className="auth-form__field">
+              <div className={styles.field}>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Пароль"
                   required
                 />
               </div>
-              <div className="auth-form__field">
+              <div className={styles.field}>
                 <input
                   type="password"
                   value={passwordConfirm}
                   onChange={(e) => setPasswordConfirm(e.target.value)}
-                  className="auth-form__input"
+                  className={styles.input}
                   placeholder="Повторите пароль"
                   required
                 />
-                {error && <p className="auth-form__error auth-form__error--visible">{error}</p>}
+                {error && <p className={`${styles.error} ${styles.errorVisible}`}>{error}</p>}
               </div>
             </div>
-            <div className="auth-form__actions">
+            <div className={styles.actions}>
               <button type="submit" className="btn btn--primary btn--full" disabled={loading}>
                 {loading ? 'Регистрация...' : 'Зарегистрироваться'}
               </button>

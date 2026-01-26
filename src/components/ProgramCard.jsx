@@ -1,63 +1,121 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { findCourseByTitle, addUserCourse } from '../api/coursesApi';
+import styles from './ProgramCard.module.css';
 
-const ProgramCard = ({ program }) => {
+const ProgramCard = ({ program, onOpenAuth }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleCardClick = () => {
     navigate(`/course/${program.id}`);
   };
 
-  const handleAddClick = (e) => {
+  const handleAddClick = async (e) => {
     e.stopPropagation();
-    navigate(`/course/${program.id}`);
+    
+    if (!isAuthenticated) {
+      if (onOpenAuth) {
+        onOpenAuth();
+      } else {
+        navigate(`/course/${program.id}`);
+      }
+      return;
+    }
+
+    setIsAdding(true);
+    
+    try {
+      // Находим курс в API по названию
+      const findResult = await findCourseByTitle(program.title);
+      
+      if (!findResult.success || !findResult.data) {
+        const errorMessage = findResult.error || 'Не удалось найти курс в системе';
+        alert(`${errorMessage}. Попробуйте перейти на страницу курса для добавления.`);
+        setIsAdding(false);
+        return;
+      }
+
+      const apiCourseId = findResult.data._id;
+      
+      // Добавляем курс
+      const result = await addUserCourse(apiCourseId);
+      
+      if (result.success || result.isDuplicate) {
+        // Обновляем localStorage
+        const savedCourses = localStorage.getItem('userCourses');
+        const courseIds = savedCourses ? JSON.parse(savedCourses) : [];
+        
+        if (!courseIds.includes(apiCourseId)) {
+          courseIds.push(apiCourseId);
+          localStorage.setItem('userCourses', JSON.stringify(courseIds));
+        }
+        
+        if (result.isDuplicate) {
+          alert('Курс уже был добавлен!');
+        } else {
+          alert('Курс успешно добавлен!');
+        }
+      } else {
+        alert(result.error || 'Не удалось добавить курс. Попробуйте еще раз.');
+      }
+    } catch (error) {
+      alert('Произошла ошибка при добавлении курса. Попробуйте еще раз.');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
-    <article className="program-card" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
+    <article className={styles.programCard} onClick={handleCardClick} style={{ cursor: 'pointer' }}>
       <div 
-        className="program-card__image" 
+        className={styles.image} 
         style={{ backgroundColor: program.bgColor }}
       >
         <button 
-          className="program-card__add-btn" 
+          className={styles.addBtn} 
           aria-label="Добавить в избранное"
           onClick={handleAddClick}
+          disabled={isAdding}
+          title={isAdding ? 'Добавление...' : 'Добавить курс'}
         >
-          +
+          {isAdding ? '...' : '+'}
         </button>
         <img 
           src={program.image} 
           alt={program.title} 
-          className="program-card__img" 
+          className={styles.img} 
         />
       </div>
-      <div className="program-card__info">
-        <h3 className="program-card__title">{program.title}</h3>
-        <div className="program-card__details">
-          <div className="program-card__detail-row">
-            <div className="program-card__detail-item">
+      <div className={styles.info}>
+        <h3 className={styles.title}>{program.title}</h3>
+        <div className={styles.details}>
+          <div className={styles.detailRow}>
+            <div className={styles.detailItem}>
               <img 
                 src="/images/svg/kalendar.svg" 
                 alt=""
-                className="program-card__detail-icon"
+                className={styles.detailIcon}
               />
               <span>{program.duration}</span>
             </div>
-            <div className="program-card__detail-item">
+            <div className={styles.detailItem}>
               <img 
                 src="/images/svg/time.svg" 
                 alt=""
-                className="program-card__detail-icon"
+                className={styles.detailIcon}
               />
               <span>{program.timePerDay}</span>
             </div>
           </div>
-          <div className="program-card__detail-row">
-            <div className="program-card__detail-item">
+          <div className={styles.detailRow}>
+            <div className={styles.detailItem}>
               <img 
                 src="/images/svg/signal.svg" 
                 alt=""
-                className="program-card__detail-icon"
+                className={styles.detailIcon}
               />
               <span>{program.difficulty}</span>
             </div>
