@@ -184,12 +184,10 @@ const ProfilePage = ({ onOpenAuth }) => {
         if (workoutsResult.success && workoutsResult.data) {
           const workouts = workoutsResult.data;
           
-          // Сбрасываем прогресс для всех тренировок
           for (const workout of workouts) {
             try {
               await resetProgress(apiCourseId, workout._id);
             } catch (error) {
-              // Игнорируем ошибки при сбросе
             }
           }
           
@@ -200,7 +198,6 @@ const ProfilePage = ({ onOpenAuth }) => {
           }));
         }
       } catch (error) {
-        // Игнорируем ошибки
       }
     }
 

@@ -28,7 +28,6 @@ const ProgramCard = ({ program, onOpenAuth }) => {
     setIsAdding(true);
     
     try {
-      // Находим курс в API по названию
       const findResult = await findCourseByTitle(program.title);
       
       if (!findResult.success || !findResult.data) {
@@ -40,11 +39,9 @@ const ProgramCard = ({ program, onOpenAuth }) => {
 
       const apiCourseId = findResult.data._id;
       
-      // Добавляем курс
       const result = await addUserCourse(apiCourseId);
       
       if (result.success || result.isDuplicate) {
-        // Обновляем localStorage
         const savedCourses = localStorage.getItem('userCourses');
         const courseIds = savedCourses ? JSON.parse(savedCourses) : [];
         

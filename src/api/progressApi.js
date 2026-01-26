@@ -1,15 +1,6 @@
-/**
- * API методы для работы с прогрессом тренировок
- */
 import { get, patch } from './apiClient';
 import { getWorkoutById } from './workoutsApi';
 
-/**
- * Получить прогресс пользователя по тренировке
- * @param {string} courseId - ID курса
- * @param {string} workoutId - ID тренировки
- * @returns {Promise<{success: boolean, data?: Object, error?: string}>}
- */
 export const getUserProgress = async (courseId, workoutId) => {
   try {
     const result = await get(
@@ -25,13 +16,6 @@ export const getUserProgress = async (courseId, workoutId) => {
   }
 };
 
-/**
- * Сохранить прогресс по тренировке
- * @param {string} courseId - ID курса
- * @param {string} workoutId - ID тренировки
- * @param {Array<number>} progressData - Массив значений прогресса
- * @returns {Promise<{success: boolean, error?: string}>}
- */
 export const saveProgress = async (courseId, workoutId, progressData) => {
   try {
     const result = await patch(
@@ -64,12 +48,6 @@ export const saveProgress = async (courseId, workoutId, progressData) => {
   }
 };
 
-/**
- * Сбросить прогресс по тренировке
- * @param {string} courseId - ID курса
- * @param {string} workoutId - ID тренировки
- * @returns {Promise<{success: boolean, error?: string}>}
- */
 export const resetProgress = async (courseId, workoutId) => {
   try {
     const result = await patch(
@@ -102,12 +80,6 @@ export const resetProgress = async (courseId, workoutId) => {
   }
 };
 
-/**
- * Вычислить процент прогресса тренировки
- * @param {Object} progressData - Данные прогресса
- * @param {Array} exercises - Массив упражнений
- * @returns {number} Процент выполнения (0-100)
- */
 export const calculateWorkoutProgress = (progressData, exercises) => {
   if (!progressData || !progressData.progressData || progressData.progressData.length === 0) {
     return 0;
@@ -133,13 +105,6 @@ export const calculateWorkoutProgress = (progressData, exercises) => {
   return Math.min(100, Math.round((workoutProgress / workoutTotal) * 100));
 };
 
-/**
- * Вычислить средний прогресс по всем тренировкам курса
- * @param {string} courseId - ID курса
- * @param {Function} getWorkoutsFn - Функция для получения тренировок
- * @param {Function} getProgressFn - Функция для получения прогресса
- * @returns {Promise<number>} Средний процент прогресса (0-100)
- */
 export const calculateCourseProgress = async (
   courseId,
   getWorkoutsFn,

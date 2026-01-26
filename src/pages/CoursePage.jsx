@@ -86,7 +86,6 @@ const CoursePage = ({ onOpenAuth }) => {
     const result = await addUserCourse(apiCourseId);
     
     if (result.success || result.isDuplicate) {
-      // Обновляем список курсов пользователя
       if (!userCourses.includes(apiCourseId)) {
         const updatedCourses = [...userCourses, apiCourseId];
         setUserCourses(updatedCourses);

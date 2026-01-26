@@ -1,12 +1,5 @@
-/**
- * Базовый API клиент с универсальной обработкой ошибок
- */
-
 const API_BASE_URL = 'https://wedev-api.sky.pro/api/fitness';
 
-/**
- * Коды ошибок и их сообщения
- */
 const ERROR_MESSAGES = {
   400: 'Некорректный запрос',
   401: 'Необходима авторизация. Войдите в систему',
@@ -20,16 +13,10 @@ const ERROR_MESSAGES = {
   unknown: 'Произошла неизвестная ошибка. Попробуйте еще раз',
 };
 
-/**
- * Получить токен авторизации из localStorage
- */
 const getAuthToken = () => {
   return localStorage.getItem('token');
 };
 
-/**
- * Парсинг ответа сервера с обработкой ошибок
- */
 const parseResponse = async (response) => {
   try {
     const contentType = response.headers.get('content-type');
@@ -47,7 +34,6 @@ const parseResponse = async (response) => {
       }
     }
 
-    // Попытка распарсить как JSON даже если content-type не указан
     try {
       return JSON.parse(text);
     } catch (e) {
@@ -58,9 +44,6 @@ const parseResponse = async (response) => {
   }
 };
 
-/**
- * Обработка ошибок HTTP запросов
- */
 const handleError = async (response, defaultMessage = ERROR_MESSAGES.unknown) => {
   const status = response.status;
   let errorMessage = ERROR_MESSAGES[status] || defaultMessage;
@@ -76,8 +59,6 @@ const handleError = async (response, defaultMessage = ERROR_MESSAGES.unknown) =>
       errorMessage = errorData;
     }
   } catch (e) {
-    // Если не удалось распарсить ответ, используем дефолтное сообщение
-    // Для 500 ошибок показываем более понятное сообщение
     if (status === 500) {
       errorMessage = 'Внутренняя ошибка сервера. Попробуйте позже.';
     }
@@ -89,9 +70,6 @@ const handleError = async (response, defaultMessage = ERROR_MESSAGES.unknown) =>
   return error;
 };
 
-/**
- * Базовый метод для выполнения HTTP запросов
- */
 const request = async (endpoint, options = {}) => {
   const {
     method = 'GET',
@@ -106,9 +84,6 @@ const request = async (endpoint, options = {}) => {
     ...headers,
   };
 
-  // API не принимает Content-Type заголовок, не добавляем его
-
-  // Добавляем токен авторизации если требуется
   if (requiresAuth) {
     const token = getAuthToken();
     if (token) {
@@ -122,7 +97,6 @@ const request = async (endpoint, options = {}) => {
     ...restOptions,
   };
 
-  // Добавляем body только если он есть
   if (body) {
     config.body = typeof body === 'string' ? body : JSON.stringify(body);
   }
@@ -130,7 +104,6 @@ const request = async (endpoint, options = {}) => {
   try {
     const response = await fetch(url, config);
 
-    // Обработка специальных статусов
     if (response.status === 405 || response.status === 404) {
       const error = await handleError(
         response,
@@ -139,59 +112,40 @@ const request = async (endpoint, options = {}) => {
       throw error;
     }
 
-    // Успешный ответ
     if (response.ok) {
       const data = await parseResponse(response);
       return { success: true, data };
     }
 
-    // Ошибка ответа
     const error = await handleError(response);
     throw error;
   } catch (error) {
-    // Если это уже обработанная ошибка, пробрасываем дальше
     if (error.status) {
       throw error;
     }
 
-    // Сетевая ошибка или другая ошибка
     const networkError = new Error(ERROR_MESSAGES.network);
     networkError.originalError = error;
     throw networkError;
   }
 };
 
-/**
- * GET запрос
- */
 export const get = (endpoint, options = {}) => {
   return request(endpoint, { ...options, method: 'GET' });
 };
 
-/**
- * POST запрос
- */
 export const post = (endpoint, body, options = {}) => {
   return request(endpoint, { ...options, method: 'POST', body });
 };
 
-/**
- * PATCH запрос
- */
 export const patch = (endpoint, body, options = {}) => {
   return request(endpoint, { ...options, method: 'PATCH', body });
 };
 
-/**
- * DELETE запрос
- */
 export const del = (endpoint, options = {}) => {
   return request(endpoint, { ...options, method: 'DELETE' });
 };
 
-/**
- * PUT запрос
- */
 export const put = (endpoint, body, options = {}) => {
   return request(endpoint, { ...options, method: 'PUT', body });
 };

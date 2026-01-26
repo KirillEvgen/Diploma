@@ -56,7 +56,6 @@ describe('ProgramCard', () => {
     const card = container.querySelector('.program-card');
     fireEvent.click(card);
     
-    // Проверяем, что произошла навигация (URL изменился)
     expect(window.location.pathname).toBe('/course/1');
   });
 

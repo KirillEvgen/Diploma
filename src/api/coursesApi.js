@@ -1,14 +1,6 @@
-/**
- * API методы для работы с курсами
- */
 import { get, post, del } from './apiClient';
 
-/**
- * Получить все доступные курсы
- * @returns {Promise<{success: boolean, data?: Array, error?: string}>}
- */
 export const getAllCourses = async (requireAuth = null) => {
-  // Если requireAuth не указан, проверяем наличие токена
   if (requireAuth === null) {
     const token = localStorage.getItem('token');
     requireAuth = !!token;
@@ -18,7 +10,6 @@ export const getAllCourses = async (requireAuth = null) => {
     const result = await get('/courses', { requiresAuth: requireAuth });
     return result;
   } catch (error) {
-    // Если ошибка 400 или 401, и мы не использовали авторизацию, попробуем с ней
     if ((error.status === 400 || error.status === 401) && !requireAuth) {
       const token = localStorage.getItem('token');
       if (token) {
@@ -38,11 +29,6 @@ export const getAllCourses = async (requireAuth = null) => {
   }
 };
 
-/**
- * Получить курс по ID
- * @param {string} courseId - ID курса
- * @returns {Promise<{success: boolean, data?: Object, error?: string}>}
- */
 export const getCourseById = async (courseId) => {
   try {
     const result = await get(`/courses/${courseId}`);
@@ -55,17 +41,11 @@ export const getCourseById = async (courseId) => {
   }
 };
 
-/**
- * Найти курс по названию (RU или EN)
- * @param {string} title - Название курса
- * @returns {Promise<{success: boolean, data?: Object, error?: string}>}
- */
 export const findCourseByTitle = async (title) => {
   try {
     const result = await getAllCourses();
     
     if (!result.success) {
-      // Если не удалось загрузить курсы, возвращаем ошибку
       return {
         success: false,
         error: result.error || 'Не удалось загрузить список курсов',
@@ -104,11 +84,6 @@ export const findCourseByTitle = async (title) => {
   }
 };
 
-/**
- * Добавить курс пользователю
- * @param {string} courseId - ID курса
- * @returns {Promise<{success: boolean, error?: string}>}
- */
 export const addUserCourse = async (courseId) => {
   try {
     const result = await post(
@@ -121,7 +96,6 @@ export const addUserCourse = async (courseId) => {
       return { success: true };
     }
     
-    // Проверка на дубликат
     const errorMessage = result.data?.message || result.error || 'Не удалось добавить курс';
     const isDuplicate = 
       errorMessage.includes('уже') ||
@@ -129,15 +103,13 @@ export const addUserCourse = async (courseId) => {
       errorMessage.includes('already');
     
     return {
-      success: isDuplicate, // Возвращаем success: true если это дубликат
+      success: isDuplicate,
       error: isDuplicate ? null : errorMessage,
       isDuplicate,
     };
   } catch (error) {
-    // Обработка специфичных ошибок
     let errorMessage = 'Не удалось добавить курс. Попробуйте еще раз.';
     
-    // Используем сообщение из ответа API, если оно есть
     if (error.data?.message) {
       errorMessage = error.data.message;
     } else if (error.message && !error.message.includes('Ошибка при обработке')) {
@@ -152,7 +124,6 @@ export const addUserCourse = async (courseId) => {
       errorMessage = 'Ошибка сервера. Попробуйте позже или обратитесь в поддержку.';
     }
     
-    // Проверка на дубликат из сообщения об ошибке
     const isDuplicate = 
       errorMessage.includes('уже') ||
       errorMessage.includes('добавлен') ||
@@ -166,10 +137,6 @@ export const addUserCourse = async (courseId) => {
   }
 };
 
-/**
- * Получить курсы пользователя
- * @returns {Promise<{success: boolean, data?: Array, error?: string}>}
- */
 export const getUserCourses = async () => {
   try {
     const result = await get('/users/me/courses', { requiresAuth: true });
@@ -183,11 +150,6 @@ export const getUserCourses = async () => {
   }
 };
 
-/**
- * Удалить курс у пользователя
- * @param {string} courseId - ID курса
- * @returns {Promise<{success: boolean, error?: string}>}
- */
 export const removeUserCourse = async (courseId) => {
   try {
     const result = await del(`/users/me/courses/${courseId}`, {

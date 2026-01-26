@@ -2,14 +2,11 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAuth } from '../useAuth';
 
-// Мокаем fetch
 global.fetch = vi.fn();
 
 describe('useAuth', () => {
   beforeEach(() => {
-    // Очищаем localStorage перед каждым тестом
     localStorage.clear();
-    // Сбрасываем моки
     vi.clearAllMocks();
   });
 
