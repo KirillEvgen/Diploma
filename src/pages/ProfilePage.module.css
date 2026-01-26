@@ -262,14 +262,12 @@
     color: var(--color-text-dark);
 }
 
-/* Десктопные стили */
 @media (min-width: 1025px) {
     .coursesList {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-/* Планшет */
 @media (max-width: 1024px) {
     .profileCard {
         width: 100%;
@@ -280,7 +278,6 @@
     }
 }
 
-/* Мобильные устройства */
 @media (max-width: 768px) {
     .profilePage {
         padding: 40px 0;
