@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import styles from './SuccessModal.module.css';
 
-const SuccessModal = ({ isOpen, onClose, message = 'Ваш прогресс засчитан!' }) => {
+const SuccessModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {

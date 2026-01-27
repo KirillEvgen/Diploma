@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './ProgressModal.module.css';
 
-const ProgressModal = ({ isOpen, onClose, exercises, currentProgress, onSave, workoutId, courseId }) => {
+const ProgressModal = ({ isOpen, onClose, exercises, currentProgress, onSave }) => {
   const [progressData, setProgressData] = useState([]);
 
   useEffect(() => {

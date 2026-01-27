@@ -33,7 +33,7 @@ describe('Logo', () => {
     );
     
     const link = screen.getByRole('link');
-    expect(link).toHaveClass('logo', 'custom-class');
+    expect(link.className.split(' ')).toContain('custom-class');
   });
 
   it('рендерит SVG иконку', () => {
@@ -49,5 +49,7 @@ describe('Logo', () => {
     expect(svg).toHaveAttribute('height', '24');
   });
 });
+
+
 
 

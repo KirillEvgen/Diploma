@@ -12,22 +12,11 @@ const ProfilePage = ({ onOpenAuth }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [userCourses, setUserCourses] = useState([]);
-  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [allApiCourses, setAllApiCourses] = useState([]);
   const [courseProgress, setCourseProgress] = useState({}); 
 
-  useEffect(() => {
-    
-    const token = localStorage.getItem('token');
-    const email = localStorage.getItem('email');
-    
-    if (!token || !email) {
-      navigate('/');
-      return;
-    }
-
-    const fetchCourseProgress = async (apiCourseId) => {
+  const fetchCourseProgress = async (apiCourseId) => {
       try {
         const workoutsResult = await getCourseWorkouts(apiCourseId);
         
@@ -64,10 +53,17 @@ const ProfilePage = ({ onOpenAuth }) => {
       }
     };
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
+    
+    if (!token || !email) {
+      navigate('/');
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
         const savedCourseIds = localStorage.getItem('userCourses');
         if (!savedCourseIds) {
           setUserCourses([]);
@@ -106,6 +102,7 @@ const ProfilePage = ({ onOpenAuth }) => {
           setUserCourses([]);
         }
       } catch (error) {
+        setUserCourses([]);
       } finally {
         setLoading(false);
       }
@@ -188,6 +185,7 @@ const ProfilePage = ({ onOpenAuth }) => {
             try {
               await resetProgress(apiCourseId, workout._id);
             } catch (error) {
+              console.error('Ошибка при сбросе прогресса:', error);
             }
           }
           
@@ -198,6 +196,7 @@ const ProfilePage = ({ onOpenAuth }) => {
           }));
         }
       } catch (error) {
+        console.error('Ошибка при сбросе прогресса курса:', error);
       }
     }
 
@@ -238,9 +237,8 @@ const ProfilePage = ({ onOpenAuth }) => {
     );
   }
 
-  
-  const userName = userData?.name || userData?.username || user?.email?.split('@')[0]?.split('.')[0] || 'Пользователь';
-  const userLogin = userData?.login || userData?.username || user?.email || '';
+  const userName = user?.email?.split('@')[0]?.split('.')[0] || 'Пользователь';
+  const userLogin = user?.email || '';
 
   return (
     <>

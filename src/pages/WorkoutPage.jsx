@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
@@ -12,7 +12,7 @@ import styles from './WorkoutPage.module.css';
 
 const WorkoutPage = ({ onOpenAuth }) => {
   const { courseId, workoutId } = useParams();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [workout, setWorkout] = useState(null);
   const [exercises, setExercises] = useState([]);
@@ -58,7 +58,7 @@ const WorkoutPage = ({ onOpenAuth }) => {
     fetchWorkout();
   }, [workoutId]);
 
-  const fetchUserProgress = async () => {
+  const fetchUserProgress = useCallback(async () => {
     if (!apiCourseId || !workoutId) {
       return;
     }
@@ -70,13 +70,13 @@ const WorkoutPage = ({ onOpenAuth }) => {
     } else {
       setUserProgress(null);
     }
-  };
+  }, [apiCourseId, workoutId]);
 
   useEffect(() => {
     if (apiCourseId && workoutId) {
       fetchUserProgress();
     }
-  }, [apiCourseId, workoutId]);
+  }, [apiCourseId, workoutId, fetchUserProgress]);
 
   useEffect(() => {
     if (!authLoading) {

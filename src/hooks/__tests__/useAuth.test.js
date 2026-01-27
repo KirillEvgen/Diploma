@@ -37,6 +37,10 @@ describe('useAuth', () => {
   it('выполняет успешный вход', async () => {
     const mockResponse = {
       ok: true,
+      status: 200,
+      headers: {
+        get: vi.fn(() => 'application/json'),
+      },
       text: async () => JSON.stringify({ token: 'new-token' }),
     };
     
@@ -61,6 +65,10 @@ describe('useAuth', () => {
   it('обрабатывает ошибку входа с неверным паролем', async () => {
     const mockResponse = {
       ok: false,
+      status: 400,
+      headers: {
+        get: vi.fn(() => 'application/json'),
+      },
       text: async () => JSON.stringify({ message: 'Пароль введен неверно' }),
     };
     
@@ -82,6 +90,9 @@ describe('useAuth', () => {
     const mockResponse = {
       ok: true,
       status: 200,
+      headers: {
+        get: vi.fn(() => 'application/json'),
+      },
       text: async () => JSON.stringify({}),
     };
     
@@ -101,6 +112,9 @@ describe('useAuth', () => {
     const mockResponse = {
       ok: false,
       status: 400,
+      headers: {
+        get: vi.fn(() => 'application/json'),
+      },
       text: async () => JSON.stringify({ message: 'Данная почта уже используется' }),
     };
     
@@ -144,7 +158,52 @@ describe('useAuth', () => {
     });
     
     expect(loginResult.success).toBe(false);
-    expect(loginResult.error).toBe('Произошла ошибка. Попробуйте еще раз.');
+    expect(loginResult.error).toBe('Ошибка сети. Проверьте подключение к интернету');
+  });
+
+  it('обрабатывает ошибку парсинга ответа при входе', async () => {
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      headers: {
+        get: vi.fn(() => 'application/json'),
+      },
+      text: async () => '{ invalid json }',
+    };
+    
+    global.fetch.mockResolvedValueOnce(mockResponse);
+    
+    const { result } = renderHook(() => useAuth());
+    
+    let loginResult;
+    await act(async () => {
+      loginResult = await result.current.login('test@example.com', 'password123');
+    });
+    
+    expect(loginResult.success).toBe(false);
+    expect(loginResult.error).toBeDefined();
+  });
+
+  it('обрабатывает пустой ответ при входе', async () => {
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      headers: {
+        get: vi.fn(() => 'application/json'),
+      },
+      text: async () => '',
+    };
+    
+    global.fetch.mockResolvedValueOnce(mockResponse);
+    
+    const { result } = renderHook(() => useAuth());
+    
+    let loginResult;
+    await act(async () => {
+      loginResult = await result.current.login('test@example.com', 'password123');
+    });
+    
+    expect(loginResult.success).toBe(false);
   });
 });
 

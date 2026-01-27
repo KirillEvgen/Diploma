@@ -8,15 +8,17 @@ import styles from './CoursePage.module.css';
 
 const CoursePage = ({ onOpenAuth }) => {
   const { id } = useParams();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
   const [userCourses, setUserCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [apiCourseId, setApiCourseId] = useState(null);
 
   const program = getProgramById(id);
 
-  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   useEffect(() => {
     const fetchApiCourseId = async () => {
       if (!program) return;
@@ -31,10 +33,7 @@ const CoursePage = ({ onOpenAuth }) => {
   }, [program]);
 
   useEffect(() => {
-    
-    
     if (!isAuthenticated) {
-      setLoading(false);
       setUserCourses([]);
       return;
     }
@@ -49,8 +48,6 @@ const CoursePage = ({ onOpenAuth }) => {
       }
     } catch (error) {
       setUserCourses([]);
-    } finally {
-      setLoading(false);
     }
   }, [isAuthenticated]);
 
@@ -67,7 +64,6 @@ const CoursePage = ({ onOpenAuth }) => {
     );
   }
 
-  
   const hasCourse = apiCourseId ? userCourses.includes(apiCourseId) : false;
 
   const handleAddCourse = async () => {
@@ -103,10 +99,6 @@ const CoursePage = ({ onOpenAuth }) => {
     
     setIsAdding(false);
   };
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
 
   return (
     <>
