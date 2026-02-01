@@ -190,11 +190,6 @@ const CoursePage = ({ onOpenAuth }) => {
                   className={styles.ctaDecoration}
                 />
                 <img 
-                  src="/images/svg/blackline.svg" 
-                  alt=""
-                  className={styles.ctaBlackline}
-                />
-                <img 
                   src="/images/svg/man.png" 
                   alt="Тренировка"
                   className={styles.ctaImg}
