@@ -200,11 +200,7 @@ const ProfilePage = ({ onOpenAuth }) => {
       }
     }
 
-    try {
-      navigate(`/course/${courseId}/workouts`);
-    } catch (error) {
-      navigate(`/course/${courseId}`);
-    }
+    navigate(`/course/${courseId}/workouts`);
   };
 
   const getCourseButtonText = (progress) => {

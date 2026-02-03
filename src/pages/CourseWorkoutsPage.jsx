@@ -45,6 +45,7 @@ const CourseWorkoutsPage = ({ onOpenAuth }) => {
         setLoading(false);
         return;
       }
+      setLoading(true);
       try {
         const [workoutsResult, progressResult] = await Promise.all([
           getCourseWorkouts(apiCourseId),
