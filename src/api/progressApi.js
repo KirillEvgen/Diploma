@@ -1,6 +1,21 @@
 import { get, patch } from './apiClient';
 import { getWorkoutById } from './workoutsApi';
 
+export const getCourseProgress = async (courseId) => {
+  try {
+    const result = await get(
+      `/users/me/progress?courseId=${courseId}`,
+      { requiresAuth: true }
+    );
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message || 'Не удалось загрузить прогресс по курсу',
+    };
+  }
+};
+
 export const getUserProgress = async (courseId, workoutId) => {
   try {
     const result = await get(
@@ -156,6 +171,7 @@ export const calculateCourseProgress = async (
 };
 
 export default {
+  getCourseProgress,
   getUserProgress,
   saveProgress,
   resetProgress,

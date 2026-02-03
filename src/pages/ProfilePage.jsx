@@ -201,14 +201,7 @@ const ProfilePage = ({ onOpenAuth }) => {
     }
 
     try {
-      const workoutsResult = await getCourseWorkouts(apiCourseId);
-      
-      if (workoutsResult.success && workoutsResult.data && workoutsResult.data.length > 0) {
-        const firstWorkout = workoutsResult.data[0];
-        navigate(`/course/${courseId}/workout/${firstWorkout._id}`);
-      } else {
-        navigate(`/course/${courseId}`);
-      }
+      navigate(`/course/${courseId}/workouts`);
     } catch (error) {
       navigate(`/course/${courseId}`);
     }

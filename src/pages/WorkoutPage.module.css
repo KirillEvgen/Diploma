@@ -2,6 +2,23 @@
     padding: 50px 0;
 }
 
+.backBtn {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 8px 0;
+    border: none;
+    background: none;
+    font-family: var(--font-family);
+    font-size: 16px;
+    color: var(--color-primary-green);
+    cursor: pointer;
+}
+
+.backBtn:hover {
+    text-decoration: underline;
+}
+
 .loading,
 .error {
     text-align: center;
