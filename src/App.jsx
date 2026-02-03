@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import CoursePage from './pages/CoursePage';
+import CourseWorkoutsPage from './pages/CourseWorkoutsPage';
 import ProfilePage from './pages/ProfilePage';
 import WorkoutPage from './pages/WorkoutPage';
 import AuthModal from './components/AuthModal';
@@ -21,6 +22,10 @@ function App() {
         <Route 
           path="/course/:id" 
           element={<CoursePage onOpenAuth={() => setAuthModalOpen(true)} />} 
+        />
+        <Route 
+          path="/course/:courseId/workouts" 
+          element={<CourseWorkoutsPage onOpenAuth={() => setAuthModalOpen(true)} />} 
         />
         <Route 
           path="/profile" 

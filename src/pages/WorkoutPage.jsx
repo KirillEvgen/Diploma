@@ -199,6 +199,13 @@ const WorkoutPage = ({ onOpenAuth }) => {
       <main className="main">
         <div className="container">
           <div className={styles.workoutPage}>
+            <button
+              type="button"
+              className={styles.backBtn}
+              onClick={() => navigate(`/course/${courseId}/workouts`)}
+            >
+              ← К списку тренировок
+            </button>
             <div className={styles.header}>
               <h1 className={styles.title}>{workout.name || 'Тренировка'}</h1>
             </div>
